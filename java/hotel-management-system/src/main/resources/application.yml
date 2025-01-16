@@ -1,0 +1,16 @@
+server:
+  port: 8010
+
+spring:
+  application:
+    name: hotel-management-system
+  datasource:
+    hikari:
+      connectionTimeout: 20000
+      maximumPoolSize: 10
+    url: jdbc:postgresql://localhost:5432/postgres
+    username: postgres
+    password: 1234
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
