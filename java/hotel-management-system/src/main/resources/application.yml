@@ -4,3 +4,7 @@ server:
 spring:
   application:
     name: hotel-management-system
+  r2dbc:
+    url: r2dbc:postgresql://localhost:5432/postgres
+    username: postgres
+    password: 1234
