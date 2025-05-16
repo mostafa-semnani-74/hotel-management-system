@@ -26,7 +26,7 @@ public class RoomServiceImpl implements RoomService {
     private final RoomMapper roomMapper;
 
     @Override
-    public Mono<SaveRoomResponseDTO> save(SaveRoomRequestDTO requestDTO) {
+    public Mono<SaveRoomResponseDTO> save(final SaveRoomRequestDTO requestDTO) {
         return roomRepository.save(roomMapper.toEntity(requestDTO))
                 .log()
                 .publishOn(scheduler)
