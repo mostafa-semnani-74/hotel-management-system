@@ -1,6 +1,7 @@
 package ir.mostafa.semnani.hotel_management_system.service.impl;
 
 import ir.mostafa.semnani.hotel_management_system.dto.request.SaveRoomRequestDTO;
+import ir.mostafa.semnani.hotel_management_system.dto.response.GetAllRoomsResponseDTO;
 import ir.mostafa.semnani.hotel_management_system.dto.response.SaveRoomResponseDTO;
 import ir.mostafa.semnani.hotel_management_system.mapper.RoomMapper;
 import ir.mostafa.semnani.hotel_management_system.repository.RoomRepository;
@@ -8,6 +9,7 @@ import ir.mostafa.semnani.hotel_management_system.service.RoomService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Scheduler;
 import reactor.core.scheduler.Schedulers;
@@ -28,10 +30,17 @@ public class RoomServiceImpl implements RoomService {
     @Override
     public Mono<SaveRoomResponseDTO> save(final SaveRoomRequestDTO requestDTO) {
         return roomRepository.save(roomMapper.toEntity(requestDTO))
-                .log()
                 .publishOn(scheduler)
-                .log()
                 .map(roomMapper::toSaveResponseDTO)
+                .log();
+    }
+
+    @Override
+    public Flux<GetAllRoomsResponseDTO> getAll() {
+        return roomRepository.findAll()
+                .map(roomMapper::toGetAllRoomsResponseDTO)
+                .publishOn(scheduler)
+                .limitRate(8)
                 .log();
     }
 
