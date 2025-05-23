@@ -8,12 +8,9 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.PostgreSQLContainer;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
 import reactor.test.StepVerifier;
 
 @SpringBootTest
-//@Testcontainers
 @ActiveProfiles("test")
 public class RoomServiceTest {
 
@@ -36,9 +33,10 @@ public class RoomServiceTest {
 
     @DynamicPropertySource
     static void configureProperties(DynamicPropertyRegistry registry) {
-        registry.add("spring.datasource.url", postgres::getJdbcUrl);
-        registry.add("spring.datasource.username", postgres::getUsername);
-        registry.add("spring.datasource.password", postgres::getPassword);
+        var r2dcUrl = postgres.getJdbcUrl().replace("jdbc", "r2dbc");
+        registry.add("spring.r2dbc.url", () -> r2dcUrl);
+        registry.add("spring.r2dbc.username", postgres::getUsername);
+        registry.add("spring.r2dbc.password", postgres::getPassword);
     }
 
     @Test
