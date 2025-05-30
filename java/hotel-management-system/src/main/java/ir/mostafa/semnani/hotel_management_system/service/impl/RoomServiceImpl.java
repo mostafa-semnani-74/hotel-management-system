@@ -29,19 +29,30 @@ public class RoomServiceImpl implements RoomService {
 
     @Override
     public Mono<SaveRoomResponseDTO> save(final SaveRoomRequestDTO requestDTO) {
-        return roomRepository.save(roomMapper.toEntity(requestDTO))
-                .publishOn(scheduler)
-                .map(roomMapper::toSaveResponseDTO)
-                .log();
+        try {
+            log.info("Saving room: {}", requestDTO);
+            return roomRepository.save(roomMapper.toEntity(requestDTO))
+                    .publishOn(scheduler)
+                    .map(roomMapper::toSaveResponseDTO)
+                    .log();
+        } catch (Exception e) {
+            log.error("error in save in RoomServiceImpl : ", e);
+            throw new RuntimeException("internal server error");
+        }
     }
 
     @Override
     public Flux<GetAllRoomsResponseDTO> getAll() {
-        return roomRepository.findAll()
-                .map(roomMapper::toGetAllRoomsResponseDTO)
-                .publishOn(scheduler)
-                .limitRate(8)
-                .log();
+        try {
+            return roomRepository.findAll()
+                    .map(roomMapper::toGetAllRoomsResponseDTO)
+                    .publishOn(scheduler)
+                    .limitRate(8)
+                    .log();
+        } catch (Exception e) {
+            log.error("error in getAll in RoomServiceImpl : ", e);
+            throw new RuntimeException("internal server error");
+        }
     }
 
 }
