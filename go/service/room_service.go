@@ -2,26 +2,25 @@ package service
 
 import (
 	"fmt"
-	"hms/model"
+	"hms/repository"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"gorm.io/driver/postgres"
-	"gorm.io/gorm"
 )
 
-func GetRooms(c *gin.Context) {
-	dsn := "host=localhost user=postgres password=1234 dbname=postgres port=5432 sslmode=disable"
-	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
+type RoomService struct {
+	roomRepository repository.RoomRepository
+}
+
+func NewRoomService(roomRepository repository.RoomRepository) *RoomService {
+	return &RoomService{roomRepository: roomRepository}
+}
+
+func (s *RoomService) GetRooms(c *gin.Context) {
+	rooms, err := s.roomRepository.FindAll()
+
 	if err != nil {
-		panic("failed to connect database")
-	}
-
-	var rooms []model.Room
-	result := db.Find(&rooms) // finds all users
-
-	if result.Error != nil {
-		panic(result.Error)
+		panic(err)
 	}
 
 	fmt.Println("get all rooms : ", rooms)

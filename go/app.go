@@ -1,6 +1,8 @@
 package main
 
 import (
+	"hms/config"
+	"hms/repository"
 	"hms/service"
 
 	"github.com/gin-gonic/gin"
@@ -9,7 +11,13 @@ import (
 func main() {
 	router := gin.Default()
 
-	router.GET("/api/v1/rooms", service.GetRooms)
+	db := config.SetupDatabase()
+
+	roomRepository := repository.NewGormRoomRepository(db)
+
+	roomService := service.NewRoomService(roomRepository)
+
+	router.GET("/api/v1/rooms", roomService.GetRooms)
 
 	router.Run("localhost:8080")
 }
