@@ -17,6 +17,8 @@ import java.util.concurrent.Semaphore;
 @Slf4j
 public class RoomServiceImpl implements RoomService {
 
+    private static final Semaphore GET_ALL_SEMAPHORE = new Semaphore(8);
+
     private final RoomRepository roomRepository;
 
     private final RoomMapper roomMapper;
@@ -27,13 +29,11 @@ public class RoomServiceImpl implements RoomService {
 
             var responseFuture = AppVirtualThreadPool.getExecutorService().submit(() -> {
 
-                Semaphore semaphore = new Semaphore(8);
-
                 try {
 
                     log.info("Getting all rooms in RoomServiceImpl");
 
-                    semaphore.acquire();
+                    GET_ALL_SEMAPHORE.acquire();
 
                     var rooms = roomRepository.findAll()
                             .stream()
@@ -49,7 +49,7 @@ public class RoomServiceImpl implements RoomService {
                     throw new RuntimeException("internal server error in vt in getAll in RoomServiceImpl");
 
                 } finally {
-                    semaphore.release();
+                    GET_ALL_SEMAPHORE.release();
                 }
 
             });
